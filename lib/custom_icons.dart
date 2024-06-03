@@ -1,3 +1,5 @@
+// ignore_for_file: null_argument_to_non_null_type
+
 import 'dart:async';
 import 'dart:ui' as ui;
 
@@ -27,14 +29,34 @@ class _CustomIconeState extends State<CustomIcone> {
   );
 
   Future<Uint8List> getBytesFromAssetes(String path, int width) async {
-    ByteData data = await rootBundle.load(path);
-    ui.Codec codec = await ui.instantiateImageCodec(data.buffer.asUint8List(),
-        targetHeight: width);
-    ui.FrameInfo fi = await codec.getNextFrame();
+    try {
+      ByteData data = await rootBundle.load(path);
+      ui.Codec codec = await ui.instantiateImageCodec(data.buffer.asUint8List(),
+          targetHeight: width);
+      ui.FrameInfo fi = await codec.getNextFrame();
 
-    return (await fi.image.toByteData(format: ui.ImageByteFormat.png))!
-        .buffer
-        .asUint8List();
+      return (await fi.image.toByteData(format: ui.ImageByteFormat.png))!
+          .buffer
+          .asUint8List();
+    } on Exception catch (e) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(
+            e.toString(),
+            style: const TextStyle(
+              color: Colors.white,
+              fontSize: 20,
+              fontWeight: FontWeight.w500,
+            ),
+          ),
+          backgroundColor: Colors.red,
+          duration: const Duration(seconds: 3),
+          behavior: SnackBarBehavior.floating,
+        ),
+      );
+
+      return Future.value(null);
+    }
   }
 
   List<String> images = [
@@ -148,6 +170,7 @@ class _CustomIconeState extends State<CustomIcone> {
               controller: customInfoWindowController,
               height: 200,
               width: 200,
+              offset: 75
             )
           ],
         ),

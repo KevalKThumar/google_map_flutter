@@ -21,9 +21,6 @@ class _GetCurrLocationState extends State<GetCurrLocation> {
       isLoading = true; // Start loading
     });
 
-    
-
-
     LocationService locationService = LocationService();
     var locationData = await locationService.getLocation();
 
@@ -45,6 +42,9 @@ class _GetCurrLocationState extends State<GetCurrLocation> {
           ),
         );
       } else {
+        setState(() {
+          isLoading = false;
+        });
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(
             content: Text(
@@ -91,7 +91,7 @@ class _GetCurrLocationState extends State<GetCurrLocation> {
   );
 
   List<Marker> markers = <Marker>[
-     Marker(
+    Marker(
       draggable: true,
       markerId: const MarkerId('1'),
       position: const LatLng(22.303486, 70.793826),
@@ -121,21 +121,39 @@ class _GetCurrLocationState extends State<GetCurrLocation> {
             else
               FloatingActionButton(
                 onPressed: () async {
-                  final GoogleMapController controller =
-                      await _controller.future;
-                  await _getLocation();
-                  controller.animateCamera(
-                    CameraUpdate.newCameraPosition(CameraPosition(
-                      target: LatLng(
-                        latitude,
-                        longitude,
+                  try {
+                    final GoogleMapController controller =
+                        await _controller.future;
+                    await _getLocation();
+                    controller.animateCamera(
+                      CameraUpdate.newCameraPosition(CameraPosition(
+                        target: LatLng(
+                          latitude,
+                          longitude,
+                        ),
+                        zoom: 14.4746,
+                      )),
+                    );
+                    setState(() {
+                      log("latitude: $latitude, longitude: $longitude");
+                    });
+                  } on Exception catch (e) {
+                    ScaffoldMessenger.of(context).showSnackBar(
+                       SnackBar(
+                        content: Text(
+                          e.toString(),
+                          style: const TextStyle(
+                            color: Colors.white,
+                            fontSize: 20,
+                            fontWeight: FontWeight.w500,
+                          ),
+                        ),
+                        backgroundColor: Colors.red,
+                        duration: const Duration(seconds: 3),
+                        behavior: SnackBarBehavior.floating,
                       ),
-                      zoom: 14.4746,
-                    )),
-                  );
-                  setState(() {
-                    log("latitude: $latitude, longitude: $longitude");
-                  });
+                    );
+                  }
                 },
                 backgroundColor: Colors.white,
                 foregroundColor: Colors.black,
