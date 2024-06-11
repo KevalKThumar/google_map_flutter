@@ -138,10 +138,3 @@ The demo app is available [here](https://drive.google.com/drive/u/0/folders/1fPI
 
 `location`: [https://pub.dev/packages/location](https://pub.dev/packages/location)
 
-## Running the App
-
-Run the app on an emulator or physical device:
-
-```sh
-flutter run
-```
